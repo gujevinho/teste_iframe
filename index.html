@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<head>
+  <title>Test Capture</title>
+  <link rel="icon" href="./favicon.ico">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      background-color: gray;
+    }
+
+    h4 {
+      color: white;
+    }
+
+    div {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    iframe {
+      border: 2px solid;
+      height: 95vh;
+      width: 95vw;
+      border-radius: none;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h4>Iframe App Facesign</h4>
+    <!--  ** FaceTecSDK iFrame Support ** *Configure iFrame Properties in the html*  -->
+    <!-- For proper behavior, allow is required for full screen and cross-domain camera. For safari allowfullscreen is required   -->
+    <!-- For proper behavior, in order to block warnings on non Safari browsers, allowfullscreen needs to be after allow   -->
+    <iframe id="facetec-iframe" allow="fullscreen;camera;geolocation" allowfullscreen src="https://app-dev.facesign.in/liveness/778eff37-e3c4-4a6c-9194-02378114f2ec/userid"></iframe>
+  </div>
+</body>
+</html>
