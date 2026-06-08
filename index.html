@@ -1,43 +1,398 @@
 <!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-  <title>Test Capture</title>
-  <link rel="icon" href="./favicon.ico">
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-  <style>
-    body {
-      margin: 0;
-      background-color: gray;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso por CPF - FaceSign</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    h4 {
-      color: white;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e6ecf0 0%, #e6ecf0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-    div {
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
 
-    iframe {
-      border: 2px solid;
-      height: 95vh;
-      width: 95vw;
-      border-radius: none;
-    }
-  </style>
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #14b8ff;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input.error {
+            border-color: #e74c3c;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #e0e0e0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: #73c6fe;
+            box-shadow: none;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #73c6fe;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            box-shadow: none;
+        }
+
+        .help-link {
+            display: block;
+            margin-top: 20px;
+            color: #14b8ff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .help-link:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .biometric-section {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .biometric-section.active {
+            display: block;
+        }
+
+        .cpf-section {
+            display: block;
+        }
+
+        .cpf-section.hidden {
+            display: none;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #e0e0e0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .cpf-format {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        /* Estilos do iframe */
+        .iframe-wrapper {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f5f5f5;
+            margin-top: 15px;
+        }
+
+        .iframe-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        .iframe-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            z-index: 2;
+            transition: opacity 0.4s ease;
+        }
+
+        .iframe-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .iframe-overlay span {
+            color: #667eea;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        body.dark-mode .container {
+            background: #1e1e2e;
+            color: #fff;
+        }
+
+        body.dark-mode .title,
+        body.dark-mode .subtitle,
+        body.dark-mode .form-group label {
+            color: #fff;
+        }
+
+        body.dark-mode .form-group input {
+            background: #2a2a3e;
+            border-color: #3a3a4e;
+            color: #fff;
+        }
+
+        body.dark-mode .btn-secondary {
+            background: #3a3a4e;
+            color: #fff;
+        }
+
+        body.dark-mode .footer {
+            border-top-color: #3a3a4e;
+            color: #888;
+        }
+
+        body.dark-mode .iframe-wrapper {
+            background: #2a2a3e;
+            border-color: #3a3a4e;
+        }
+
+        body.dark-mode .iframe-overlay {
+            background: rgba(30, 30, 46, 0.9);
+        }
+    </style>
 </head>
 <body>
-  <div>
-    <h4>Iframe App Facesign</h4>
-    <!--  ** FaceTecSDK iFrame Support ** *Configure iFrame Properties in the html*  -->
-    <!-- For proper behavior, allow is required for full screen and cross-domain camera. For safari allowfullscreen is required   -->
-    <!-- For proper behavior, in order to block warnings on non Safari browsers, allowfullscreen needs to be after allow   -->
-    <iframe id="facetec-iframe" allow="fullscreen;camera;geolocation" allowfullscreen src="https://app-dev.facesign.in/liveness/778eff37-e3c4-4a6c-9194-02378114f2ec/userid"></iframe>
-  </div>
+    <div class="container">
+        <div class="logo">FaceSign</div>
+        <h1 class="title">Acesso por CPF</h1>
+        <p class="subtitle">Digite seu CPF para acessar o sistema.</p>
+
+        <!-- CPF Section -->
+        <div id="cpfSection" class="cpf-section">
+            <div class="form-group">
+                <label for="cpf">CPF *</label>
+                <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14">
+                <p class="cpf-format">Formato: 000.000.000-00</p>
+                <p class="error-message" id="cpfError">CPF inválido. Verifique os dígitos.</p>
+            </div>
+            <button class="btn" onclick="validateCPF()">Acessar</button>
+        </div>
+
+        <!-- Biometric Section (com iframe) -->
+        <div id="biometricSection" class="biometric-section">
+            <div class="iframe-wrapper">
+                <div class="iframe-overlay" id="iframeOverlay">
+                    <div class="spinner"></div>
+                    <span>Carregando autenticação...</span>
+                </div>
+                <iframe id="facesignIframe" title="Autenticação FaceSign" allow="camera"></iframe>
+            </div>
+            <button class="btn btn-secondary" onclick="backToCPF()">← Voltar e alterar CPF</button>
+        </div>
+
+        <a href="#" class="help-link">Precisa de ajuda?</a>
+
+        <div class="footer">
+            <p>Copyright © 2026 - FaceSign</p>
+        </div>
+    </div>
+
+    <script>
+        const IFRAME_BASE_URL = "https://app-dev.facesign.in/sso/778eff37-e3c4-4a6c-9194-02378114f2ec";
+
+        // Validação do CPF e abertura do iframe
+        function validateCPF() {
+            const cpfInput = document.getElementById('cpf');
+            const cpfError = document.getElementById('cpfError');
+            const cpfValue = cpfInput.value.replace(/\D/g, '');
+
+            // Validações básicas
+            if (cpfValue.length !== 11) {
+                cpfInput.classList.add('error');
+                cpfError.classList.add('show');
+                return;
+            }
+
+            if (/^(\d)\1+$/.test(cpfValue)) {
+                cpfInput.classList.add('error');
+                cpfError.classList.add('show');
+                return;
+            }
+
+            cpfInput.classList.remove('error');
+            cpfError.classList.remove('show');
+
+            // Monta a URL com o parâmetro clientUserId
+            const iframeUrl = `${IFRAME_BASE_URL}?clientUserId=${encodeURIComponent(cpfValue)}`;
+
+            // Exibe a seção biométrica
+            document.getElementById('cpfSection').classList.add('hidden');
+            document.getElementById('biometricSection').classList.add('active');
+
+            // Carrega o iframe
+            const iframe = document.getElementById('facesignIframe');
+            const overlay = document.getElementById('iframeOverlay');
+
+            // Mostra o loading
+            overlay.classList.remove('hidden');
+
+            // Quando o iframe terminar de carregar, esconde o overlay
+            iframe.onload = function() {
+                overlay.classList.add('hidden');
+            };
+
+            // Define a URL do iframe
+            iframe.src = iframeUrl;
+        }
+
+        // Voltar para o CPF
+        function backToCPF() {
+            const iframe = document.getElementById('facesignIframe');
+            // Limpa o iframe para encerrar a sessão atual
+            iframe.src = 'about:blank';
+
+            document.getElementById('cpfSection').classList.remove('hidden');
+            document.getElementById('biometricSection').classList.remove('active');
+        }
+
+        // Máscara do CPF
+        document.getElementById('cpf').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            
+            e.target.value = value;
+        });
+
+        // Permite submeter com Enter
+        document.getElementById('cpf').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                validateCPF();
+            }
+        });
+    </script>
 </body>
 </html>
